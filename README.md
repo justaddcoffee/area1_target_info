@@ -11,7 +11,7 @@ pip install -r requirements.txt
 
 ### Generate protein target info
 ```
-jupyter notebook
+jupyter notebook # notebook emits tsv here: data/target_candidates.tsv
 ```
 
 
