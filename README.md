@@ -1,1 +1,2 @@
-# area1_target_info
+SARS-CoV-2 Protein Target information for Area 1 Therapeutics effort
+
