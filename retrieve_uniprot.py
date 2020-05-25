@@ -75,15 +75,15 @@ def add_uniprot_txt_info(data_dir: str, viral_data: pd.DataFrame,
             try:
                 dat = pd.read_csv(infile, sep="   ", comment='#', header=None)
             except EmptyDataError:
-                new_col_list.append('Unknown')
+                new_col_list.append('')
                 continue
 
             matching_rows = dat[list(dat.iloc[:, 0].str.contains(col_1_str) & dat.iloc[:, 1].str.contains(col_2_str))]
             if matching_rows.shape[0] > 0:
                 new_col_list.append(matching_rows.iloc[:,1].to_string(index=False))
             else:
-                new_col_list.append('Unknown')
+                new_col_list.append('')
         else:
-            new_col_list.append('Unknown')
+            new_col_list.append('')
     viral_data[new_col_name] = new_col_list
     return None
