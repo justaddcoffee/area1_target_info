@@ -2,3 +2,4 @@ wget
 gitpython
 git+git://github.com/Knowledge-Graph-Hub/kg-covid-19.git@master
 git+git://github.com/deepakunni3/kgx@kg-covid-19
+jupyter
