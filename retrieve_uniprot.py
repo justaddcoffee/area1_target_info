@@ -1,5 +1,7 @@
+import csv
 import os
 import re
+import pandas
 import requests
 from pandas.errors import EmptyDataError
 from tqdm import tqdm
@@ -64,6 +66,38 @@ def add_uniprot_info(data_dir: str, viral_data: pd.DataFrame, col_idx: int,
     return None
 
 
+def add_tclin_tchem_info(viral_data: pd.DataFrame,
+                         tclin_col: str,
+                         tchem_col: str,
+                         new_col_name: str,
+                         tclin_data_file) -> None:
+
+    new_col_list: list = []
+
+    d = {}
+    with open(tclin_data_file) as fd:
+        rd = csv.reader(fd, delimiter="\t", quotechar='"')
+        header = next(rd)
+        for row in rd:
+            d[row[0]] = dict(zip(header, row))
+
+    for this_id in list(viral_data['protein ID']):
+        druggability = ''
+
+        if re.match("UniProtKB", this_id) and this_id in d:
+            entries = []
+            if d[this_id]['tclin'] == 'True':
+                entries.append('tclin')
+            if d[this_id]['tchem'] == 'True':
+                entries.append('tchem')
+            druggability += "|".join(entries)
+
+        new_col_list.append(druggability)
+
+    viral_data[new_col_name] = new_col_list
+    return None
+
+
 def add_uniprot_txt_info(data_dir: str, viral_data: pd.DataFrame,
                          col_1_str: str, col_2_str: str, new_col_name: str,
                          file_ext: str = ".txt") -> None:
@@ -72,11 +106,31 @@ def add_uniprot_txt_info(data_dir: str, viral_data: pd.DataFrame,
         if re.match("UniProtKB", this_id):
             (prefix, uniprot_id) = this_id.split(":")
             infile = os.path.join(data_dir, uniprot_id + file_ext)
-            try:
-                dat = pd.read_csv(infile, sep="   ", comment='#', header=None)
-            except EmptyDataError:
-                new_col_list.append('')
-                continue
+
+            # find line number where SQ starts for txt files, because pandas won't parse
+            # them correctly in their entirety
+            if infile.endswith(".txt"):
+                sq_start = 0
+                with open(infile) as fp:
+                    for line in fp:
+                        if line.startswith('SQ'):
+                            break
+                        sq_start += 1
+                try:
+                    dat = pd.read_csv(infile, sep="   ", comment='FT                   ',
+                                      header=None, nrows=sq_start)
+                except pandas.errors.ParserError:
+                    pass
+                except EmptyDataError:
+                    new_col_list.append('')
+                    continue
+
+            else:
+                try:
+                    dat = pd.read_csv(infile, sep="   ", comment='#', header=None)
+                except EmptyDataError:
+                    new_col_list.append('')
+                    continue
 
             matching_rows = dat[list(dat.iloc[:, 0].str.contains(col_1_str) & dat.iloc[:, 1].str.contains(col_2_str))]
             if matching_rows.shape[0] > 0:

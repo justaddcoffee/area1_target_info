@@ -3,8 +3,10 @@ import tarfile
 import wget
 
 data_dir = 'data'
-intact_path = '/'.join(['transformed', 'intact'])
-sars_genes_path = '/'.join(['transformed', 'sars_cov_2_gene_annot'])
+transformed_dir = 'transformed'
+intact_path = '/'.join([transformed_dir, 'intact'])
+sars_genes_path = '/'.join([transformed_dir, 'sars_cov_2_gene_annot'])
+drug_central = '/'.join([transformed_dir, 'drug_central'])
 
 for this_dir in [data_dir,
                  os.path.join(data_dir, intact_path),
@@ -20,7 +22,7 @@ if not os.path.exists(kg_nodes) or not os.path.exists(kg_edges):
     with tarfile.open(kg_tar) as tar:
         tar.extractall(data_dir)
 
-for path in [intact_path, sars_genes_path]:
+for path in [intact_path, sars_genes_path, drug_central]:
     node_file = '/'.join([data_dir, path, 'nodes.tsv'])
     edge_file = '/'.join([data_dir, path, 'edges.tsv'])
     node_url = '/'.join(['http://kg-hub.berkeleybop.io', path, 'nodes.tsv'])
