@@ -73,8 +73,10 @@ add_uniprot_txt_info(uniprot_data_dir, target_info, 'DR', 'PDB;', 'pdb_data')
 # add GO annotations
 add_uniprot_txt_info(uniprot_data_dir, target_info, 'DR', 'GO\:', 'go_annotations')
 
-target_info.to_csv(path_or_buf=
-                             os.path.join(data_dir, 'target_candidates_plus.tsv'),
+target_info.drop_duplicates(subset=['protein ID', ], inplace=True)
+target_info.sort_values(by=['species', 'protein ID'], inplace=True)
+
+target_info.to_csv(path_or_buf=os.path.join(data_dir, 'target_candidates_plus.tsv'),
                    sep="\t",
                    index=False)
 
