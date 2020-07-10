@@ -1,0 +1,19 @@
+prefix owl: <http://www.w3.org/2002/07/owl#>
+prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+prefix bl: <https://w3id.org/biolink/vocab/>
+SELECT DISTINCT ?covp ?covplab ?humanp ?humanplab ?humanp2 ?humanplab2 WHERE
+{
+{ ?covp bl:interacts_with ?humanp . OPTIONAL { ?humanp bl:interacts_with ?humanp2 } } UNION 
+{ ?humanp bl:interacts_with ?covp . OPTIONAL { ?humanp bl:interacts_with ?humanp2 } } UNION
+{ ?covp bl:interacts_with ?humanp . OPTIONAL { ?humanp2 bl:interacts_with ?humanp } } UNION 
+{ ?humanp bl:interacts_with ?covp . OPTIONAL { ?humanp2 bl:interacts_with ?humanp } }
+?covp bl:category bl:Protein; <https://www.example.org/UNKNOWN/ncbi_taxid> ?covtaxon .
+?humanp bl:category bl:Protein; <https://www.example.org/UNKNOWN/ncbi_taxid> ?humantaxon .
+?humanp2 bl:category bl:Protein; <https://www.example.org/UNKNOWN/ncbi_taxid> ?humantaxon .
+OPTIONAL { ?covp rdfs:label ?covplab } .
+OPTIONAL { ?humanp rdfs:label ?humanplab } .
+OPTIONAL { ?humanp2 rdfs:label ?humanplab2 } .
+FILTER(?covtaxon="2697049")
+FILTER(?humantaxon="9606")
+}
