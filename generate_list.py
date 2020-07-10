@@ -49,7 +49,21 @@ run_query('TargetCandidates', input_dir=data_dir, output_dir=data_dir)
 
 target_info = read_csv('data/target_candidates.tsv', sep="\t")
 
-target_info.drop(['confidence score','comments'],axis=1, inplace = True)
+pnnl_data = read_csv('data/pnnl/PNNLTargetList_2020_06_08 - TargetList_2020_06_05.tsv', sep="\t")
+pnnl_data.rename(columns={'Uniprot': 'protein ID'}, inplace=True)
+
+pnnl_data['protein ID'] = \
+    pnnl_data['protein ID'].apply(lambda x: "{}{}".format('UniProtKB:', x))
+
+target_info.drop(['confidence score','comments'], axis=1, inplace=True)
+
+target_info = pd.concat([pnnl_data, target_info], axis=0, join='outer', ignore_index=False, keys=None,
+          levels=None, names=None, verify_integrity=False, copy=True)
+
+host_only = False
+if host_only:
+    indexNames = target_info[target_info['species'] == 'V'].index
+    target_info.drop(indexNames, inplace=True)
 
 # add druggability info
 add_tclin_tchem_info(viral_data=target_info, tclin_col='tclin', tchem_col='tchem',
