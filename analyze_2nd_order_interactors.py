@@ -1,10 +1,8 @@
 import os
-import re
 
 import pandas as pd
-from numpy import nan
 
-tclin_data_file = 'data/nodes.tsv' # Drug central nodes, with Tclin/Tchem/Tbio info
+tclin_data_file = 'output/drug_central_nodes.tsv' # Drug central nodes, with Tclin/Tchem/Tbio info
 interaction_data = 'output/query_interactors_2nd.result'
 output_file = 'output/query_interactors_2nd_druggable.tsv'
 output_uniq_file = 'output/query_interactors_2nd_druggable_uniq.tsv'
